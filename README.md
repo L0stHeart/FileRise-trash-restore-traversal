@@ -15,5 +15,3 @@ My earlier scores were 9.0, then 8.8 and 8.2, all with scope changed. Scope stay
 Local Docker only, `error311/filerise-docker` at v3.24.0 (commit 765eccc) and again at v3.25.0.
 
 Reported privately on 31 July 2026. The vendor published the advisory on 12 August 2026.
-
-L0stHeart
