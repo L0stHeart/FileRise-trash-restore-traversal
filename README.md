@@ -1,30 +1,19 @@
-# FileRise: path traversal in trash restore
+# FileRise trash restore does not stay inside storage
 
 https://github.com/error311/FileRise/security/advisories/GHSA-2qx7-5r33-3hhj
 
-FileRise is a self-hosted PHP file manager (error311/FileRise). I reviewed v3.24.0, commit `765eccc`, and reported this on 2026-07-31 through GitHub private vulnerability reporting. The vendor published it on 2026-08-12. Fixed in 3.25.0. No CVE has been assigned.
+Severity: high. No CVE. CWE-22, CWE-434, CWE-829.
 
-Restoring a trashed file does not keep the destination inside storage. `FileModel::restoreFiles()` trusts the stored path too far. On its own, a restore is an administrator action. I also had a separate upload bug, published as GHSA-5gg8-vgm3-x4fj, that lets a low-privileged user place the bad entry. If an administrator later restores it, the result is code execution. The vendor treated those as two advisories and scored this one for the combined case.
+FileRise 3.7.0 up to but not including 3.25.0 is affected. Fixed in 3.25.0. The vendor took 3.7.0 as the earliest release they would confirm from the imported history.
 
-My first scores were 9.0 and then 8.8 and 8.2, with scope changed. Those were wrong. Scope stays on the application. The numbers we agreed:
+`restoreFiles()` trusts the stored path too far, so a restore can land outside storage. Taken alone, that restore is an administrator action. Scored that way it is 7.2 (`CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H`). The published advisory is the other reading, 8.0 (`CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:H/I:H/A:H`): a low-privileged user plants the entry using the separate upload bug [GHSA-5gg8-vgm3-x4fj](https://github.com/error311/FileRise/security/advisories/GHSA-5gg8-vgm3-x4fj), and an administrator restores it later. That case reaches code execution. The vendor kept the two bugs on separate advisories. They do not share a fix.
 
-| Reading | Vector | Score |
-|---|---|---|
-| Published advisory. Low-privileged user plants the entry, an administrator restores it. | CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:H/I:H/A:H | 8.0 High |
-| Restore taken alone. Administrator only, no click from a second person. | CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H | 7.2 High |
+My earlier scores were 9.0, then 8.8 and 8.2, all with scope changed. Scope stays on the application. 8.0 and 7.2 are the numbers we agreed.
 
-| | |
-|---|---|
-| Affected | 3.7.0 ≤ version < 3.25.0 |
-| Fixed | 3.25.0 |
-| CWE | CWE-22, CWE-434, CWE-829 |
-| CVE | Not assigned |
+3.25.0 fixes the restore. I retested it. Deleting a file and restoring it puts the file back where it was. The traversal does not. The vendor was going to request the CVE from GitHub and asked me not to file one elsewhere. I did not. As of 22 September 2026 there is still no CVE id.
 
-The vendor set 3.7.0 as the earliest confirmed release from the imported history, rather than claiming every older tag. I agreed. 3.25.0 fixes the restore. I retested it. Deleting a file and restoring it puts the file back where it was. The traversal does not.
+Local Docker only, `error311/filerise-docker` at v3.24.0 (commit 765eccc) and again at v3.25.0.
 
-They said a CVE would be requested through the GitHub advisory after the bounds were settled, and asked me not to request one separately. I did not. As of 2026-09-22 there is still no CVE id on the advisory.
-
-Local Docker only, `error311/filerise-docker` at v3.24.0, then v3.25.0 for the fix. No other deployment.
+Reported privately on 31 July 2026. The vendor published the advisory on 12 August 2026.
 
 L0stHeart
-https://github.com/L0stHeart
